@@ -1,0 +1,16 @@
+# Test a basic get request
+
+handle "/endpoint/1" {
+    expect req.method eq "GET"
+    expect req.headers["User-Agent"] ~ "chrome"
+    expect req.body eq ""
+    tx -body "Hello world!" -header "X-HTC-Origin: true" -status 200
+}
+
+client "nemo" {
+    tx -url "/endpoint/1" -method "GET" -header "User-Agent: this might look like chrome to some"
+    expect resp.status ne 404
+    expect resp.headers["Server"] ~ "^ATS/[0-9]\.[0-9]\.[0-9]$"
+    expect resp.headers["Something-That-Should-Not-Be-Set"] eq ""
+    expect resp.status eq 200
+}
