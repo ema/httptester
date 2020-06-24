@@ -29,6 +29,7 @@ import (
 )
 
 var verbose = flag.Bool("verbose", false, "enable verbose mode")
+var shutdownDelay = flag.Int("shutdownDelay", 0, "how many seconds to wait before exiting")
 
 func waitForGET(url string) {
 	for {
@@ -121,6 +122,12 @@ func main() {
 			}
 		}
 	}
+
+	if *verbose {
+		log.Printf("Exiting in %d seconds\n", *shutdownDelay)
+	}
+
+	time.Sleep(time.Second * time.Duration(*shutdownDelay))
 
 	proxy.stop()
 
