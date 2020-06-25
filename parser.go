@@ -74,6 +74,12 @@ func parseHandle(s *scanner) (HandleStanza, error) {
 			// Sending the response is the last allowed action in a 'handle'
 			// block
 			token = s.ScanUseful()
+
+			// Skip newline
+			if token.typ == NEWLINE {
+				token = s.ScanUseful()
+			}
+
 			if token.typ != CLOSE_CURLY {
 				return h, fmt.Errorf("Parse error in 'handle' stanza: expecting '}' after 'tx' command, got %q", token)
 			} else {

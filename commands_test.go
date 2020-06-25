@@ -39,7 +39,19 @@ func TestExpectParse(t *testing.T) {
 	assert.Equal(t, "GET", exp.expected)
 }
 
-func TestExpectRequest(t *testing.T) {
+func TestExpectParseFail(t *testing.T) {
+	s := newScanner(strings.NewReader("banana eq \"POTATO\""))
+	exp := Expect{}
+	err := exp.Parse(s)
+	assert.Error(t, err)
+
+	s = newScanner(strings.NewReader("resp,wat"))
+	exp = Expect{}
+	err = exp.Parse(s)
+	assert.Error(t, err)
+}
+
+func TestExpectRequestMethod(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/", nil)
 	exp := Expect{field: EXPECT_METHOD, operator: EQUAL, expected: "GET"}
 
@@ -68,11 +80,26 @@ func TestExpectRequestPanic(t *testing.T) {
 	assert.Panics(t, func() { exp.Request(r) })
 }
 
+func TestExpectResponseStatus(t *testing.T) {
+	s := newScanner(strings.NewReader("resp.status eq 404"))
+	exp := Expect{}
+	err := exp.Parse(s)
+	assert.Equal(t, nil, err)
+
+	resp := http.Response{
+		StatusCode: 404,
+	}
+	assert.Equal(t, true, exp.Response(resp))
+
+	resp.StatusCode = 200
+	assert.Equal(t, false, exp.Response(resp))
+}
+
 func TestTxRespToString(t *testing.T) {
 	r := TxResp{
 		statusCode: 404,
 	}
-	assert.Equal(t, "tx HTTP 404: \"\"", r.String())
+	assert.Equal(t, "HTTP 404: \"\"", r.String())
 }
 
 func TestTxRespSend(t *testing.T) {

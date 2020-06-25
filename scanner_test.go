@@ -73,7 +73,7 @@ func TestScanUseful(t *testing.T) {
 		newScanTest("}", CLOSE_CURLY, "}"),
 		newScanTest("~", TILDE, "~"),
 		newScanTest("$", ILLEGAL, "$"),
-		newScanTest("# banana potato\n  \n\n handle", HANDLE, "handle"),
+		newScanTest("# banana potato\n  \n\n handle", NEWLINE, "\n"),
 		newScanTest("# banana potato\n\"ciao\"", STRING, "ciao"),
 		newScanTest("# banana", EOF, ""),
 		newScanTest("     ", EOF, ""),
@@ -114,5 +114,5 @@ client "nemo" {
 		i++
 	}
 
-	assert.Equal(t, 68, i)
+	assert.Equal(t, 81, i)
 }

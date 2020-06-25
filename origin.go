@@ -16,22 +16,27 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 type Origin struct {
-	errors []error
-	port   int
+	errors  []error
+	port    int
+	verbose bool
 }
 
-func NewOrigin(port int) Origin {
-	return Origin{port: port}
+func NewOrigin(port int, verbose bool) Origin {
+	return Origin{port: port, verbose: verbose}
 }
 
 func (o *Origin) addHandler(hs HandleStanza) {
 	http.HandleFunc(hs.URIPath, func(w http.ResponseWriter, req *http.Request) {
 		// Expect things
 		for _, exp := range hs.Expectations {
+			if o.verbose {
+				log.Println("Expecting", exp)
+			}
 			if exp.Request(*req) == false {
 				o.errors = append(o.errors, fmt.Errorf("FAILED: %s (actual=%q)", exp, exp.ActualRequest(*req)))
 			}

@@ -256,7 +256,7 @@ func (r *TxResp) Parse(s *scanner) error {
 
 	for {
 		token := s.ScanUseful()
-		if token.typ == EOF || token.typ == CLOSE_CURLY {
+		if token.typ == EOF || token.typ == CLOSE_CURLY || token.typ == NEWLINE {
 			s.unread()
 			break
 		}
@@ -333,7 +333,7 @@ func (r *TxReq) Parse(s *scanner) error {
 	for {
 		token := s.ScanUseful()
 		// Only "expect" is allowed after "tx" in the client stanza
-		if token.typ == EOF || token.typ == CLOSE_CURLY || token.typ == EXPECT {
+		if token.typ == EOF || token.typ == CLOSE_CURLY || token.typ == NEWLINE {
 			s.unread()
 			break
 		}

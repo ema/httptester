@@ -34,6 +34,7 @@ const (
 	ILLEGAL tokenType = iota
 	EOF
 	WS
+	NEWLINE
 
 	// Literals
 	STRING  // header names and values, method names, ...
@@ -92,6 +93,8 @@ func (t token) String() string {
 		return fmt.Sprintf("STRING: %s", t.val)
 	case INTEGER:
 		return fmt.Sprintf("INTEGER: %s", t.val)
+	case NEWLINE:
+		return "\\n"
 	case EOF:
 		return "EOF"
 	}
@@ -142,6 +145,8 @@ func (s *scanner) scan() token {
 	switch ch {
 	case eof:
 		return newToken(EOF, "")
+	case '\n':
+		return newToken(NEWLINE, string(ch))
 	case '.':
 		return newToken(DOT, string(ch))
 	case '[':
@@ -286,8 +291,8 @@ func (s *scanner) read() rune {
 // unread places the previously read rune back on the reader.
 func (s *scanner) unread() { _ = s.r.UnreadRune() }
 
-// isWhitespace returns true if the rune is a space, tab, or newline.
-func isWhitespace(ch rune) bool { return ch == ' ' || ch == '\t' || ch == '\n' }
+// isWhitespace returns true if the rune is a space or a tab
+func isWhitespace(ch rune) bool { return ch == ' ' || ch == '\t' }
 
 // isLetter returns true if the rune is a letter.
 func isLetter(ch rune) bool { return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') }

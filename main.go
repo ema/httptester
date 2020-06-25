@@ -77,7 +77,7 @@ func main() {
 	originPort := freePortOrDie()
 	proxyPort := freePortOrDie()
 
-	origin := NewOrigin(originPort)
+	origin := NewOrigin(originPort, *verbose)
 	origin.start()
 
 	proxy := NewProxy(proxyPort, originPort)
@@ -114,6 +114,9 @@ func main() {
 		}
 
 		for _, exp := range cs.Expectations {
+			if *verbose {
+				log.Println("Expecting", exp)
+			}
 			if exp.Response(*resp) == false {
 				proxy.stop()
 				log.Println(cs.Request)
