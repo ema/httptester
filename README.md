@@ -52,3 +52,8 @@ $ httptester not-a-post.htc
 $ echo $?
 1
 ```
+
+## License
+
+This project is licensed under the Apache License - see the [LICENSE](LICENSE)
+file for details.
