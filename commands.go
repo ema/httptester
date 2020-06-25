@@ -25,6 +25,7 @@ import (
 )
 
 // Command is the interface that must be implemented by all commands
+// (eg: expect, tx)
 type Command interface {
 	// Parse fills the command structure by parsing the data in the given
 	// scanner, thus implementing the command-specific parsing logic. The
@@ -32,6 +33,8 @@ type Command interface {
 	Parse(*scanner) error
 }
 
+// ExpectField represents the various attributes that the expect command can
+// take. For example: req.method, resp.status, ...
 type ExpectField int
 
 const (
@@ -136,6 +139,8 @@ func (e *Expect) Parse(s *scanner) error {
 	return nil
 }
 
+// expectThing returns true if what we expect is true given the value of
+// 'actual'
 func (e Expect) expectThing(actual string) bool {
 	switch e.operator {
 	case EQUAL:
@@ -154,6 +159,9 @@ func (e Expect) expectThing(actual string) bool {
 	return false
 }
 
+// ActualRequest returns the value in the given http.Request object
+// corresponding to this Expect. For instance, if we are expecting something
+// about the request method, here we return the actual request method sent
 func (e Expect) ActualRequest(req http.Request) string {
 	var actual string
 
@@ -185,6 +193,7 @@ func (e Expect) Request(req http.Request) bool {
 	return e.expectThing(e.ActualRequest(req))
 }
 
+// StringResponse returns a string representation of the given http.Response
 func (e Expect) StringResponse(resp http.Response) string {
 	s := fmt.Sprintf("HTTP %d\n", resp.StatusCode)
 	for key, value := range resp.Header {
@@ -193,6 +202,9 @@ func (e Expect) StringResponse(resp http.Response) string {
 	return s
 }
 
+// ActualResponse returns the value in the given http.Response object
+// corresponding to this Expect. For instance, if we are expecting something
+// about the response status, here we return the actual response status
 func (e Expect) ActualResponse(resp http.Response) string {
 	var actual string
 
@@ -236,6 +248,8 @@ func (r TxResp) String() string {
 	return fmt.Sprintf("HTTP %d: %q", r.statusCode, r.body)
 }
 
+// Parse a tx command in the handle stanza, in other words a response. Eg:
+// tx -body "Hello world!" -header "Cache-Control: s-maxage=120" -status 200
 func (r *TxResp) Parse(s *scanner) error {
 	r.statusCode = 200
 	r.headers = make(map[string]string)
@@ -310,6 +324,8 @@ func (r TxReq) String() string {
 	return s
 }
 
+// Parse a tx command in the client stanza, in other words a request. Eg:
+// tx -url "/endpoint/1" -method "GET" -header "X-Debug: x-cache"
 func (r *TxReq) Parse(s *scanner) error {
 	r.method = "GET"
 	r.headers = make(map[string]string)
